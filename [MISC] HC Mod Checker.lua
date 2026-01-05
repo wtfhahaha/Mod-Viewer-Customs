@@ -72,6 +72,7 @@ local user_ids = {
 	36786456,
 	3376509853,
 	1226086717,
+	8812431342,
 }
 local players = {}
 local notifications = {}
@@ -166,3 +167,4 @@ end
 
 cheat.register("onSlowUpdate", get_players)
 cheat.register("onPaint", draw_notifications)
+
