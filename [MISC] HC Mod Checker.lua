@@ -167,4 +167,3 @@ end
 
 cheat.register("onSlowUpdate", get_players)
 cheat.register("onPaint", draw_notifications)
-
