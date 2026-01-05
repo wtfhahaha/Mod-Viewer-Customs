@@ -13,14 +13,10 @@ local user_ids = {
 	5832510716,
 	2520455298,
 	2050161622,
-	4891411890,
 	1106320934,
 	3600755696,
-	3576067905,
-	2415886442,
 	137723571,
 	935864306,
-	29242182,
 	582370,
 	51796,
 	8460804257,
@@ -32,11 +28,9 @@ local user_ids = {
 	60265,
 	4337893156,
 	682887852,
-	5801091074,
 	8390626336,
 	7197552531,
 	558638,
-	7411200326,
 	2578972524,
 	8142054648,
 	4544888724,
@@ -44,7 +38,6 @@ local user_ids = {
 	8280673725,
 	2412582194,
 	2357168230,
-	1226086717,
 	7438567227,
 	7412920468,
 	7411162962,
@@ -155,7 +148,7 @@ local function draw_notifications()
             local text_y_1 = current_y + 10
             local text_y_2 = text_y_1 + text_height + 4
 
-            draw.TextOutlined("Mod Detected!", text_x, text_y_1, Color3.fromRGB(255, 50, 50), "Verdana", alpha)
+            draw.TextOutlined("Nigger Detected!", text_x, text_y_1, Color3.fromRGB(255, 50, 50), "Verdana", alpha)
             draw.TextOutlined("Name: " .. notification.name, text_x, text_y_2, Color3.new(1, 1, 1), "Verdana", alpha)
 
             local bar_progress = (30000 - time) / 30000
