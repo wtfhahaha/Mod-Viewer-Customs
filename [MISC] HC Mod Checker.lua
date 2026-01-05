@@ -1,0 +1,175 @@
+local user_ids = {
+    878674194, -- Replace with actual user IDs of players with mods
+    4724648468,
+    149759419,
+    2294188446,
+    5818696713,
+    2594901738,
+    1433699977,
+    4062996700,
+    1341435676,
+    7352054833,
+    189713559,
+    5832510716,
+    2520455298,
+    2050161622,
+    4891411890,
+    1106320934,
+    3600755696,
+    3576067905,
+    2415886442,
+    137723571,
+    935864306,
+    29242182,
+    582370,
+    51796,
+    8460804257,
+    3525918505,
+    2835853128,
+    2395613299,
+    2506320774,
+    494401813,
+    60265,
+    4337893156,
+    682887852,
+    5801091074,
+    8390626336,
+    7197552531,
+    558638,
+    7411200326,
+    2578972524,
+    8142054648,
+    4544888724,
+    7225903,
+    8280673725,
+    2412582194,
+    2357168230,
+    1226086717,
+    7438567227,
+    7412920468,
+    7411162962,
+    9409314548,
+    16132908,
+    5042090443,
+    1491576084,
+    4045474373,
+    8130930626,
+    8137825406,
+    4709828943,
+    2415886442,
+    5801091074,
+    29242182,
+    7411200326,
+    3924496689,
+    852347682,
+    279773,
+    5019169384,
+	4891411890,
+    1602593335,
+    326671671,
+    343182231,
+    4339819060,
+    1658496,
+    2388584611,
+    1679536495,
+	3576067905,
+	2555761663,
+	4649864403,
+	5036683208,
+	36786456,
+	3376509853,
+	1226086717,
+}
+local players = {}
+local notifications = {}
+
+local function ease_out_quint(t)
+    return 1 - (1 - t) ^ 5
+end
+
+local function notify(player_name)
+    table.insert(notifications, 1, {
+        name = player_name,
+        time = utility.GetTickCount()
+    })
+end
+
+local function get_players()
+    local active_players = {}
+    for _, player in ipairs(game.Players:GetChildren()) do
+        if player and player.Address then
+            active_players[player.Address] = {
+                user_id = player.UserId,
+                name = player.Name
+            }
+            if not players[player.Address] then
+                for _, mod_id in ipairs(user_ids) do
+                    if player.UserId == mod_id then
+                        notify(player.Name)
+                        break 
+                    end
+                end
+            end
+        end
+    end
+    players = active_players
+end
+
+local function draw_notifications()
+    if #notifications == 0 then
+        return
+    end
+
+    local now = utility.GetTickCount()
+    local screen_width, screen_height = cheat.GetWindowSize()
+
+    local active_notifications = {}
+
+    for i, notification in ipairs(notifications) do
+        local time = now - notification.time
+        if time < 30000 then
+            table.insert(active_notifications, notification)
+
+            local progress
+            if time < 500 then
+                progress = time / 500
+            elseif time > 30000 - 500 then
+                progress = (30000 - time) / 500
+            else
+                progress = 1
+            end
+
+            local eased_progress = ease_out_quint(progress)
+
+            local current_x = screen_width + ((screen_width - 250 - 5) - screen_width) * eased_progress
+            local current_y = screen_height - 35 - 65
+
+            local alpha = 255 * eased_progress
+
+            draw.RectFilled(current_x, current_y, 250, 65, Color3.fromRGB(18, 22, 28), 5, alpha)
+            draw.Rect(current_x, current_y, 250, 65, Color3.new(0, 1, 1), 1, 5, alpha)
+            
+            local _, text_height = draw.GetTextSize("A", "Verdana")
+
+            local text_x = current_x + 10
+            local text_y_1 = current_y + 10
+            local text_y_2 = text_y_1 + text_height + 4
+
+            draw.TextOutlined("Mod Detected!", text_x, text_y_1, Color3.fromRGB(255, 50, 50), "Verdana", alpha)
+            draw.TextOutlined("Name: " .. notification.name, text_x, text_y_2, Color3.new(1, 1, 1), "Verdana", alpha)
+
+            local bar_progress = (30000 - time) / 30000
+            local bar_width = (250 - 12) * bar_progress
+            local bar_x = current_x + 6
+            local bar_y = current_y + 65 - 4 - 8
+            
+            draw.RectFilled(bar_x, bar_y, bar_width, 4, Color3.new(0, 1, 1), 2, alpha)
+
+            base_y = current_y - 5
+        end
+    end
+    notifications = active_notifications
+end
+
+cheat.register("onSlowUpdate", get_players)
+cheat.register("onPaint", draw_notifications)
