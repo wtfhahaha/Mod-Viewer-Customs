@@ -118,50 +118,51 @@ local function draw_notifications()
     local screen_width, screen_height = cheat.GetWindowSize()
 
     local active_notifications = {}
+    local notification_height = 65
+    local margin = 5
+    local current_y_position = screen_height - notification_height -- Starting y position
 
     for i, notification in ipairs(notifications) do
         local time = now - notification.time
         if time < 30000 then
             table.insert(active_notifications, notification)
 
-            local progress
+            local progress = 1
             if time < 500 then
                 progress = time / 500
             elseif time > 30000 - 500 then
                 progress = (30000 - time) / 500
-            else
-                progress = 1
             end
 
             local eased_progress = ease_out_quint(progress)
-
             local current_x = screen_width + ((screen_width - 250 - 5) - screen_width) * eased_progress
-            local current_y = screen_height - 35 - 65
-
             local alpha = 255 * eased_progress
 
-            draw.RectFilled(current_x, current_y, 250, 65, Color3.fromRGB(18, 22, 28), 5, alpha)
-            draw.Rect(current_x, current_y, 250, 65, Color3.new(0, 1, 1), 1, 5, alpha)
+            -- Draw the notification background
+            draw.RectFilled(current_x, current_y_position, 250, notification_height, Color3.fromRGB(18, 22, 28), 5, alpha)
+            draw.Rect(current_x, current_y_position, 250, notification_height, Color3.new(0, 1, 1), 1, 5, alpha)
             
             local _, text_height = draw.GetTextSize("A", "Verdana")
-
             local text_x = current_x + 10
-            local text_y_1 = current_y + 10
-            local text_y_2 = text_y_1 + text_height + 4
-
-            draw.TextOutlined("Nigger Detected!", text_x, text_y_1, Color3.fromRGB(255, 50, 50), "Verdana", alpha)
-            draw.TextOutlined("Name: " .. notification.name, text_x, text_y_2, Color3.new(1, 1, 1), "Verdana", alpha)
-
-            local bar_progress = (30000 - time) / 30000
-            local bar_width = (250 - 12) * bar_progress
-            local bar_x = current_x + 6
-            local bar_y = current_y + 65 - 4 - 8
+            local text_y = current_y_position + 10
             
-            draw.RectFilled(bar_x, bar_y, bar_width, 4, Color3.new(0, 1, 1), 2, alpha)
+            -- Draw the title and name
+            draw.TextOutlined("Nigger Spotted!", text_x, text_y, Color3.fromRGB(255, 50, 50), "Verdana", alpha)
+            draw.TextOutlined("Name: " .. notification.name, text_x, text_y + text_height + 4, Color3.new(1, 1, 1), "Verdana", alpha)
 
-            base_y = current_y - 5
+            -- Draw the loading bar
+            local bar_progress = (30000 - time) / 30000  -- Calculate progress
+            local bar_width = (250 - 12) * bar_progress  -- Width of the bar based on time left
+            local bar_x = current_x + 6
+            local bar_y = current_y_position + notification_height - 4 - 8  -- Position of the bar
+
+            draw.RectFilled(bar_x, bar_y, bar_width, 4, Color3.new(0, 1, 1), 2, alpha)  -- Draw the loading bar
+
+            -- Update position for the next notification
+            current_y_position = current_y_position - (notification_height + margin)
         end
     end
+
     notifications = active_notifications
 end
 
