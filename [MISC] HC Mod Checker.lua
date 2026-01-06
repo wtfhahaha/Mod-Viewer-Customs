@@ -148,7 +148,7 @@ local function draw_notifications()
             local text_y = current_y_position + 10
             
             -- Draw the title and name
-            draw.TextOutlined("Nigger Spotted!", text_x, text_y, Color3.fromRGB(255, 50, 50), "Verdana", alpha)
+            draw.TextOutlined("Mod Detected!", text_x, text_y, Color3.fromRGB(255, 50, 50), "Verdana", alpha)
             draw.TextOutlined("Name: " .. notification.name, text_x, text_y + text_height + 4, Color3.new(1, 1, 1), "Verdana", alpha)
 
             -- Draw the loading bar
@@ -169,5 +169,6 @@ end
 
 cheat.register("onSlowUpdate", get_players)
 cheat.register("onPaint", draw_notifications)
+
 
 
