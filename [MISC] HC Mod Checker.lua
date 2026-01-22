@@ -98,6 +98,16 @@ local function notify(player_name)
     })
 end
 
+-- Check if a user ID is a moderator
+local function is_moderator(user_id)
+    for _, mod_id in ipairs(user_ids) do
+        if user_id == mod_id then
+            return true
+        end
+    end
+    return false
+end
+
 local function get_players()
     local active_players = {}
     for _, player in ipairs(game.Players:GetChildren()) do
@@ -130,7 +140,7 @@ local function draw_notifications()
     local active_notifications = {}
     local notification_height = 65
     local margin = 5
-    local current_y_position = screen_height - notification_height -- Starting y position
+    local current_y_position = screen_height - notification_height
 
     for i, notification in ipairs(notifications) do
         local time = now - notification.time
@@ -148,7 +158,6 @@ local function draw_notifications()
             local current_x = screen_width + ((screen_width - 250 - 5) - screen_width) * eased_progress
             local alpha = 255 * eased_progress
 
-            -- Draw the notification background
             draw.RectFilled(current_x, current_y_position, 250, notification_height, Color3.fromRGB(18, 22, 28), 5, alpha)
             draw.Rect(current_x, current_y_position, 250, notification_height, Color3.new(0, 1, 1), 1, 5, alpha)
             
@@ -156,19 +165,16 @@ local function draw_notifications()
             local text_x = current_x + 10
             local text_y = current_y_position + 10
             
-            -- Draw the title and name
             draw.TextOutlined("Mod Detected!", text_x, text_y, Color3.fromRGB(255, 50, 50), "Verdana", alpha)
             draw.TextOutlined("Name: " .. notification.name, text_x, text_y + text_height + 4, Color3.new(1, 1, 1), "Verdana", alpha)
 
-            -- Draw the loading bar
-            local bar_progress = (30000 - time) / 30000  -- Calculate progress
-            local bar_width = (250 - 12) * bar_progress  -- Width of the bar based on time left
+            local bar_progress = (30000 - time) / 30000
+            local bar_width = (250 - 12) * bar_progress
             local bar_x = current_x + 6
-            local bar_y = current_y_position + notification_height - 4 - 8  -- Position of the bar
+            local bar_y = current_y_position + notification_height - 4 - 8
 
-            draw.RectFilled(bar_x, bar_y, bar_width, 4, Color3.new(0, 1, 1), 2, alpha)  -- Draw the loading bar
+            draw.RectFilled(bar_x, bar_y, bar_width, 4, Color3.new(0, 1, 1), 2, alpha)
 
-            -- Update position for the next notification
             current_y_position = current_y_position - (notification_height + margin)
         end
     end
@@ -176,10 +182,45 @@ local function draw_notifications()
     notifications = active_notifications
 end
 
+-- Draw *MOD* text above moderators' heads
+local function draw_mod_labels()
+    local localPlayer = entity.GetLocalPlayer()
+    if not localPlayer then return end
+    
+    local entity_players = entity.GetPlayers()
+    
+    for _, player in ipairs(entity_players) do
+        -- Check if this player is a moderator using their UserId
+        if is_moderator(player.UserId) then
+            -- Get head position
+            local headPos = player:GetBonePosition("Head")
+            
+            if headPos then
+                -- Calculate distance to player
+                local distance = (headPos - localPlayer.Position).Magnitude
+                
+                -- Scale offset based on distance (farther = smaller offset)
+                -- Increased the multiplier from 1000 to 1500 for more height
+                local scaleFactor = math.max(30, math.min(150, 1500 / distance))
+                
+                -- Convert 3D world position to 2D screen position
+                local screenX, screenY, onScreen = utility.WorldToScreen(headPos)
+                
+                if onScreen then
+                    -- Draw red "*MOD*" text above their head
+                    local redColor = Color3.new(1, 0, 0)
+                    local textWidth, textHeight = draw.GetTextSize("*MOD*", "SmallestPixel")
+                    
+                    -- Center the text horizontally and position above head
+                    draw.TextOutlined("*MOD*", screenX - (textWidth / 2), screenY - scaleFactor, redColor, "SmallestPixel")
+                end
+            end
+        end
+    end
+end
+
 cheat.register("onSlowUpdate", get_players)
-cheat.register("onPaint", draw_notifications)
-
-
-
-
-
+cheat.register("onPaint", function()
+    draw_notifications()
+    draw_mod_labels()
+end)
